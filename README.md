@@ -55,7 +55,7 @@ in `wiring.py`.
 
 - Linux with systemd
 - Python 3.12 or newer
-- `python-pyside6` 6.11 or newer (Qt 6, including Qt Multimedia)
+- `pyside6` 6.11 or newer (Qt 6, including Qt Multimedia)
 - `v4l-utils`, which provides `v4l2-ctl`
 - `linkctl`, from
   [Insta360 Link 1 and 2 Controller for Linux](https://github.com/vrwallace/Insta360-Link-1-and-2-Controller-for-Linux),
@@ -65,7 +65,7 @@ in `wiring.py`.
 On Arch Linux:
 
 ```bash
-sudo pacman -S python-pyside6 v4l-utils python-pipx fpc
+sudo pacman -S pyside6 v4l-utils python-pipx fpc
 ```
 
 Build `linkctl` from its source. Read the source first: it sends raw
@@ -90,7 +90,7 @@ default for desktop users (`groups | grep video` to check).
 ### From a release
 
 Download the wheel (`link_studio-<version>-py3-none-any.whl`) from the
-[releases page](https://github.com/LukeMcCann/link-studio/releases), then:
+[releases page](https://github.com/VTech-Studios/link-studio/releases), then:
 
 ```bash
 pipx install --system-site-packages link_studio-1.0.0-py3-none-any.whl
@@ -105,7 +105,7 @@ and already installed. To upgrade later, install the newer wheel with
 Clone the repository and install it in editable mode:
 
 ```bash
-git clone https://github.com/LukeMcCann/link-studio.git
+git clone https://github.com/VTech-Studios/link-studio.git
 cd link-studio
 pipx install --system-site-packages --editable .
 ```

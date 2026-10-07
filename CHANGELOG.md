@@ -26,5 +26,5 @@ First release.
   through a systemd user service, with no root access needed.
 - `link-studio --apply` for applying the saved profile without the GUI.
 
-[Unreleased]: https://github.com/LukeMcCann/link-studio/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/LukeMcCann/link-studio/releases/tag/v1.0.0
+[Unreleased]: https://github.com/VTech-Studios/link-studio/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/VTech-Studios/link-studio/releases/tag/v1.0.0
