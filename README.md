@@ -2,7 +2,7 @@
 
 A Linux control panel for the Insta360 Link 2 webcam.
 
-![Link Studio showing the Framing tab: pan, tilt and zoom sliders, a nudge pad and six camera presets](media/link-studio.png)
+![Link Studio showing the Framing page beside the preview: pan, tilt and zoom sliders, a nudge pad and six camera presets](media/link-studio.png)
 
 Insta360's own Link Controller only runs on Windows and macOS. On Linux the
 camera works as a normal webcam, but its framing, AI tracking and startup
@@ -12,14 +12,19 @@ the camera connects, because the camera itself forgets them on power loss.
 
 ## Features
 
-| Tab | What it does |
+The window has a sidebar of pages on the left and a live preview on the
+right, so you can watch the picture change while you adjust it.
+
+| Page | What it does |
 | --- | --- |
 | Framing | Pan, tilt and zoom sliders, a 5° nudge pad, a centre button, and six position presets stored in the camera. |
 | Image | Every standard control the camera reports: brightness, contrast, white balance, focus and so on. Built from the camera at runtime, so new firmware controls appear automatically. |
 | AI and modes | AI tracking on or off, tracking framing (head, half body, full body), and the Normal, DeskView, Whiteboard and Overhead modes. |
-| Preview | A live picture. Opens the camera only while switched on. |
 | Rotated cam | Starts and stops the `cam-rotate` virtual camera, for a camera turned on its side. Shown only when `cam-rotate` is installed. |
 | Startup | Saves your settings and re-applies them whenever the camera connects. |
+
+The preview stays beside every page, but only opens the camera while you
+switch it on, so a call can keep using the camera the rest of the time.
 
 ## Platform support
 
@@ -60,7 +65,7 @@ in `wiring.py`.
 - `linkctl`, from
   [Insta360 Link 1 and 2 Controller for Linux](https://github.com/vrwallace/Insta360-Link-1-and-2-Controller-for-Linux),
   on your `PATH`
-- Optional: `cam-rotate`, for the Rotated cam tab
+- Optional: `cam-rotate`, for the Rotated cam page
 
 On Arch Linux:
 
@@ -183,8 +188,9 @@ EOF
 The camera powers up with AI tracking on and every other setting at its
 default. To restore your own setup automatically:
 
-1. Set the camera up on the Framing, Image and AI tabs.
-2. On the Startup tab, choose whether tracking should be on, and which mode
+1. Set the camera up on the Framing, Image and AI and modes pages, with
+   the preview on so you can see the result.
+2. On the Startup page, choose whether tracking should be on, and which mode
    to use when it is off.
 3. Click **Save current settings**.
 4. Tick **Apply automatically whenever the camera connects**.
@@ -206,7 +212,7 @@ link-studio --apply
 ### Using the camera in a call at the same time
 
 Changing a setting never needs exclusive access, so every control works
-while a browser or video call is using the camera. Only the Preview tab
+while a browser or video call is using the camera. Only the preview
 needs the camera to itself, and it reports an error if something else has
 it.
 
@@ -219,7 +225,7 @@ set part of its name:
 LINK_STUDIO_CAMERA="Obsbot" link-studio
 ```
 
-Standard controls work with any UVC camera. The AI and modes tab, presets
+Standard controls work with any UVC camera. The AI and modes page, presets
 and centring use `linkctl`, which only supports the Insta360 Link and Link 2.
 
 ## How automatic apply works
@@ -258,7 +264,7 @@ in this table, and on interfaces rather than concrete classes.
 | Ports | `ports.py` | Protocols for everything outside the application: running commands, reading controls, vendor features, storage, autostart, rotation. |
 | Services | `services/` | Use cases: saving and applying a startup profile, and the wait-and-apply logic run on connect. |
 | Infrastructure | `infrastructure/` | Adapters that implement the ports with `v4l2-ctl`, `linkctl`, sysfs, systemd, JSON files and `cam-rotate`. |
-| Interface | `ui/` | Qt widgets. One class per tab, one editor class per control type, and a shared model that every view listens to. |
+| Interface | `ui/` | Qt widgets. One class per page, a preview panel, one editor class per control type, a shared model that every view listens to, and one palette that themes the window. |
 | Composition | `wiring.py`, `app.py`, `config.py` | The only place concrete classes are chosen and connected. |
 
 Some design decisions:
@@ -267,13 +273,13 @@ Some design decisions:
   collaborators through its constructor. Tests pass in fakes instead of
   patching modules.
 - **Interface segregation.** Vendor features are split into
-  `TrackingBackend` and `GimbalBackend`, so the AI tab cannot move the
-  gimbal and the Framing tab cannot change modes. One adapter,
+  `TrackingBackend` and `GimbalBackend`, so the AI page cannot move the
+  gimbal and the Framing page cannot change modes. One adapter,
   `LinkctlBackend`, implements both.
 - **One source of truth for control values.** `ControlsModel` reads the
   camera and emits `updated`. Every panel listens to it, so a change made
   anywhere (a slider, a preset, applying a profile) appears everywhere
-  after one read, and the tabs never refer to each other.
+  after one read, and the pages never refer to each other.
 - **Open for extension.** Adding a control type means adding one editor
   class and one entry in `EDITORS`. Adding a camera backend means
   implementing the ports and changing `wiring.py`.
@@ -379,12 +385,12 @@ The wheel and source distribution appear in `dist/`.
 
 ## Limitations
 
-- The Preview tab's start path is not covered by tests, because it needs a
+- The preview's start path is not covered by tests, because it needs a
   physical camera. Everything else has line and branch coverage.
 - `linkctl` always exits with status 0. Link Studio treats a command as
   failed unless `linkctl` prints `OK`, which is how `linkctl` reports
   success.
-- The camera cannot report its tracking or mode state back, so the AI tab
+- The camera cannot report its tracking or mode state back, so the AI page
   uses buttons rather than toggles.
 - Hand gestures are handled inside the camera's firmware and cannot be
   disabled from Linux.

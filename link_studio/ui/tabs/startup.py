@@ -9,7 +9,7 @@ from ...ports import Autostart
 from ...services.startup import StartupService
 from ..controls_model import ControlsModel
 from ..feedback import FAILURE_TIMEOUT_MS, StatusFeedback
-from ..layout import button_row, fill, group, note, page
+from ..layout import button_row, card, fill, note, page
 from .modes import MODE_LABELS
 
 
@@ -41,11 +41,13 @@ class StartupTab(QWidget):
         fill(
             self,
             page(
-                group(
+                "Startup",
+                "Save your setup and restore it every time the camera connects.",
+                card(
                     "Settings to restore",
                     note(
                         "The camera resets when it loses power and comes back with AI tracking on. "
-                        "Set it up on the other tabs, choose tracking and mode here, then save. "
+                        "Set it up on the other pages, choose tracking and mode here, then save. "
                         "Every picture setting, plus pan, tilt and zoom, is stored."
                     ),
                     self.tracking,
@@ -53,7 +55,7 @@ class StartupTab(QWidget):
                     button_row([("Save current settings", self.save), ("Apply now", self.apply_now)]),
                     self.summary,
                 ),
-                group(
+                card(
                     "When to restore",
                     self.automatic,
                     note(

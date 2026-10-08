@@ -9,6 +9,7 @@ from ..domain import Control, ControlKind
 
 SLIDER_DEBOUNCE_MS = 120
 SLIDER_PAGE_STEPS = 10
+SPIN_WIDTH = 84
 
 
 class ControlEditor(QWidget):
@@ -78,6 +79,7 @@ class IntegerEditor(ControlEditor):
             widget.setRange(control.minimum, control.maximum)
             widget.setSingleStep(control.step)
         self._slider.setPageStep(control.step * SLIDER_PAGE_STEPS)
+        self._spin.setFixedWidth(SPIN_WIDTH)
 
         self._debounce = QTimer(self)
         self._debounce.setSingleShot(True)

@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMessageBox, QStatusBar, QWidget
+from PySide6.QtWidgets import QApplication, QMessageBox, QStatusBar
 
 from ..config import Config
 from ..domain import CameraError
@@ -13,30 +13,29 @@ from ..ports import CommandRunner
 from ..wiring import Services, build_locator, build_services
 from .controls_model import ControlsModel
 from .feedback import StatusFeedback
-from .main_window import MainWindow
+from .main_window import MainWindow, Page
+from .preview import PreviewPanel
 from .tabs.framing import FramingTab
 from .tabs.image import ImageTab
 from .tabs.modes import ModesTab
-from .tabs.preview import PreviewTab
 from .tabs.rotation import RotationTab
 from .tabs.startup import StartupTab
+from .theme import Palette, stylesheet
 
 APP_NAME = "Link Studio"
+PALETTE = Palette()
 
 
-def build_tabs(
-    config: Config, services: Services, model: ControlsModel, feedback: StatusFeedback
-) -> list[tuple[str, QWidget]]:
-    tabs: list[tuple[str, QWidget]] = [
-        ("Framing", FramingTab(model, services.vendor, feedback)),
-        ("Image", ImageTab(model, feedback)),
-        ("AI and modes", ModesTab(services.vendor, feedback)),
-        ("Preview", PreviewTab(config.camera_name, feedback)),
+def build_pages(services: Services, model: ControlsModel, feedback: StatusFeedback) -> list[Page]:
+    pages: list[Page] = [
+        ("framing", "Framing", FramingTab(model, services.vendor, feedback)),
+        ("image", "Image", ImageTab(model, feedback)),
+        ("modes", "AI and modes", ModesTab(services.vendor, feedback)),
     ]
     if services.rotation is not None:
-        tabs.append(("Rotated cam", RotationTab(services.rotation, feedback)))
-    tabs.append(("Startup", StartupTab(services.startup, services.autostart, model, feedback)))
-    return tabs
+        pages.append(("rotation", "Rotated cam", RotationTab(services.rotation, feedback)))
+    pages.append(("startup", "Startup", StartupTab(services.startup, services.autostart, model, feedback)))
+    return pages
 
 
 def build_window(config: Config, runner: CommandRunner) -> MainWindow:
@@ -60,8 +59,11 @@ def build_window(config: Config, runner: CommandRunner) -> MainWindow:
     status_bar = QStatusBar()
     feedback = StatusFeedback(status_bar)
     window = MainWindow(
-        build_tabs(config, services, model, feedback),
+        build_pages(services, model, feedback),
+        PreviewPanel(config.camera_name, feedback, PALETTE),
         status_bar,
+        camera=f"{config.camera_name} on {device}",
+        palette=PALETTE,
         on_refresh=lambda: feedback.run("Refreshed", model.refresh),
     )
     feedback.show(f"Connected to {device}")
@@ -77,6 +79,7 @@ def run(config: Config, runner: CommandRunner) -> int:
     app = existing if isinstance(existing, QApplication) else QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setWindowIcon(QIcon.fromTheme("camera-web"))
+    app.setStyleSheet(stylesheet(PALETTE))
     try:
         window = build_window(config, runner)
     except CameraError as error:

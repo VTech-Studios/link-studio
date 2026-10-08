@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QLabel, QWidget
 from ...domain import RotationDirection
 from ...ports import RotationService
 from ..feedback import StatusFeedback
-from ..layout import button_row, fill, group, note, page
+from ..layout import button_row, card, fill, note, page
 
 
 class RotationTab(QWidget):
@@ -19,8 +19,10 @@ class RotationTab(QWidget):
         fill(
             self,
             page(
-                group(
-                    "Virtual camera for a camera turned on its side",
+                "Rotated cam",
+                "A virtual camera for a camera turned on its side.",
+                card(
+                    "Virtual camera",
                     self.status,
                     button_row(
                         [
@@ -33,7 +35,7 @@ class RotationTab(QWidget):
                         "While running, Rotated Cam holds the real camera, so call sites must pick "
                         '"Rotated Cam". Stop it to use the camera directly again.'
                     ),
-                )
+                ),
             ),
         )
         self.update_status()

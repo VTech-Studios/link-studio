@@ -16,6 +16,7 @@ from link_studio.ui import application
 from link_studio.ui.controls_model import ControlsModel
 from link_studio.ui.feedback import StatusFeedback
 from link_studio.ui.main_window import MainWindow
+from link_studio.ui.preview import PreviewPanel
 from link_studio.wiring import Services
 from tests.fakes import (
     FakeAutostart,
@@ -67,22 +68,22 @@ def services(rotation: FakeRotation | None) -> Services:
 @pytest.mark.parametrize(
     ("rotation", "titles"),
     [
-        (FakeRotation(), ["Framing", "Image", "AI and modes", "Preview", "Rotated cam", "Startup"]),
-        (None, ["Framing", "Image", "AI and modes", "Preview", "Startup"]),
+        (FakeRotation(), ["Framing", "Image", "AI and modes", "Rotated cam", "Startup"]),
+        (None, ["Framing", "Image", "AI and modes", "Startup"]),
     ],
 )
-def test_build_tabs_offers_rotation_only_when_available(
-    qtbot: QtBot, config: Config, rotation: FakeRotation | None, titles: list[str]
+def test_build_pages_offers_rotation_only_when_available(
+    qtbot: QtBot, rotation: FakeRotation | None, titles: list[str]
 ) -> None:
     wired = services(rotation)
     status = QStatusBar()
     qtbot.addWidget(status)
 
-    tabs = application.build_tabs(config, wired, ControlsModel(wired.controls), StatusFeedback(status))
-    for _, widget in tabs:
+    pages = application.build_pages(wired, ControlsModel(wired.controls), StatusFeedback(status))
+    for _, _, widget in pages:
         qtbot.addWidget(widget)
 
-    assert [title for title, _ in tabs] == titles
+    assert [title for _, title, _ in pages] == titles
 
 
 def test_build_window_for_the_connected_camera(qtbot: QtBot, config: Config) -> None:
@@ -92,7 +93,8 @@ def test_build_window_for_the_connected_camera(qtbot: QtBot, config: Config) -> 
     window = application.build_window(config, runner)
     qtbot.addWidget(window)
 
-    assert window.tabs.tabText(0) == "Framing"
+    assert window.titles()[0] == "Framing"
+    assert window.findChild(PreviewPanel) is not None
     assert window.statusBar().currentMessage() == "Connected to /dev/video0"
 
 

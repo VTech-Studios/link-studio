@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QWidget
 from ...domain import CameraMode, TrackingFrame
 from ...ports import TrackingBackend
 from ..feedback import StatusFeedback
-from ..layout import button_row, fill, group, note, page
+from ..layout import button_row, card, fill, note, page
 
 FRAME_LABELS = {
     TrackingFrame.HEAD: "Head",
@@ -39,7 +39,9 @@ class ModesTab(QWidget):
         fill(
             self,
             page(
-                group(
+                "AI and modes",
+                "Choose whether the camera follows you, and how it frames the shot.",
+                card(
                     "AI tracking",
                     button_row(
                         [
@@ -52,13 +54,13 @@ class ModesTab(QWidget):
                         "side, or it will follow you along the wrong axis and shake."
                     ),
                 ),
-                group(
+                card(
                     "Tracking framing",
                     button_row(
                         [(label, partial(self.set_framing, frame)) for frame, label in FRAME_LABELS.items()]
                     ),
                 ),
-                group(
+                card(
                     "Camera mode",
                     button_row(
                         [(label, partial(self.set_mode, mode)) for mode, label in MODE_LABELS.items()]

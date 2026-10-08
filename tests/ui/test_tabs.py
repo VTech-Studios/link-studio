@@ -6,7 +6,6 @@ from link_studio.domain import CameraError, CameraMode, Control, Profile, Rotati
 from link_studio.services.startup import StartupService
 from link_studio.ui.controls_model import ControlsModel
 from link_studio.ui.feedback import StatusFeedback
-from link_studio.ui.main_window import MainWindow
 from link_studio.ui.tabs.framing import ARCSEC_PER_DEGREE, FramingTab, degrees, magnification
 from link_studio.ui.tabs.image import ImageTab
 from link_studio.ui.tabs.modes import ModesTab
@@ -268,16 +267,3 @@ class TestStartupTab:
 
         assert not tab.automatic.isChecked()
         assert status.currentMessage() == "Failed: Automatic apply enabled: systemctl failed"
-
-
-def test_main_window_assembles_tabs_and_refresh(qtbot: QtBot) -> None:
-    refreshed: list[bool] = []
-    window = MainWindow(
-        [("One", QWidget()), ("Two", QWidget())], QStatusBar(), lambda: refreshed.append(True)
-    )
-    qtbot.addWidget(window)
-
-    button(window, "Refresh").click()
-
-    assert [window.tabs.tabText(i) for i in range(window.tabs.count())] == ["One", "Two"]
-    assert refreshed == [True]

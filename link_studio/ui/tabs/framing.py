@@ -5,14 +5,14 @@ from __future__ import annotations
 from collections.abc import Callable
 from functools import partial
 
-from PySide6.QtWidgets import QGridLayout, QLabel, QPushButton, QWidget
+from PySide6.QtWidgets import QGridLayout, QLabel, QWidget
 
 from ...domain import PRESET_SLOTS, Control
 from ...ports import GimbalBackend
 from ..controls_model import ControlsModel
 from ..controls_panel import ControlsPanel
 from ..feedback import StatusFeedback
-from ..layout import fill, group, note, page
+from ..layout import button, card, fill, note, page
 
 ARCSEC_PER_DEGREE = 3600
 NUDGE_DEGREES = 5
@@ -52,13 +52,17 @@ class FramingTab(QWidget):
         fill(
             self,
             page(
-                group(
+                "Framing",
+                "Aim and zoom the camera, and keep positions you return to.",
+                card(
                     "Position and zoom",
                     self.panel,
-                    note("AI tracking overrides pan and tilt. Turn it off on the AI tab to aim by hand."),
+                    note(
+                        "AI tracking overrides pan and tilt. Turn it off under AI and modes to aim by hand."
+                    ),
                 ),
-                group(f"Nudge ({NUDGE_DEGREES}° per click)", self._nudge_pad()),
-                group("Presets (stored in the camera)", self._presets()),
+                card(f"Nudge, {NUDGE_DEGREES}° per click", self._nudge_pad()),
+                card("Presets, stored in the camera", self._presets()),
             ),
         )
 
@@ -85,25 +89,17 @@ class FramingTab(QWidget):
         pad = QWidget()
         grid = QGridLayout(pad)
         for text, row, column, name, direction in NUDGE_BUTTONS:
-            button = QPushButton(text)
-            button.clicked.connect(partial(self.nudge, name, direction))
-            grid.addWidget(button, row, column)
-        centre = QPushButton("Centre")
-        centre.clicked.connect(self.centre)
-        grid.addWidget(centre, 1, 1)
+            grid.addWidget(button(text, partial(self.nudge, name, direction)), row, column)
+        grid.addWidget(button("Centre", self.centre), 1, 1)
         return pad
 
     def _presets(self) -> QWidget:
         container = QWidget()
         grid = QGridLayout(container)
         for slot in PRESET_SLOTS:
-            save = QPushButton("Save here")
-            save.clicked.connect(partial(self.save_preset, slot))
-            recall = QPushButton("Go to")
-            recall.clicked.connect(partial(self.recall_preset, slot))
             grid.addWidget(QLabel(f"Preset {slot + 1}"), slot, 0)
-            grid.addWidget(save, slot, 1)
-            grid.addWidget(recall, slot, 2)
+            grid.addWidget(button("Save here", partial(self.save_preset, slot)), slot, 1)
+            grid.addWidget(button("Go to", partial(self.recall_preset, slot)), slot, 2)
         return container
 
     def _then_refresh(self, action: Callable[[], None]) -> Callable[[], None]:

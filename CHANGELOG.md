@@ -6,6 +6,16 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- The preview is now a panel beside the settings instead of a tab of its
+  own, so the picture stays in view while you adjust it. It still opens
+  the camera only while switched on.
+- Pages are chosen from a sidebar on the left rather than tabs along the
+  top, and the settings and preview can be resized against each other.
+- New dark theme with titled pages, grouped cards and line icons, applied
+  the same way on every desktop.
+
 ## [1.0.0] - 2026-09-29
 
 First release.

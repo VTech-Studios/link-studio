@@ -5,16 +5,17 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from ..domain import Control
 from .controls_model import ControlsModel
 from .editors import ControlEditor, create_editor
 from .feedback import StatusFeedback
+from .layout import button, label
 
 Formatter = Callable[[int], str]
-LABEL_WIDTH = 190
-READOUT_WIDTH = 70
+LABEL_WIDTH = 140
+READOUT_WIDTH = 56
 
 
 class ControlRow(QWidget):
@@ -32,16 +33,16 @@ class ControlRow(QWidget):
         self._readout.setMinimumWidth(READOUT_WIDTH)
         self._readout.setVisible(formatter is not None)
 
-        label = QLabel(control.label)
-        label.setMinimumWidth(LABEL_WIDTH)
-        reset = QPushButton("Reset")
+        name = label(control.label)
+        name.setFixedWidth(LABEL_WIDTH)
+        name.setWordWrap(True)
+        reset = button("Reset", lambda: self._on_edited(control.default), "ghost")
         reset.setToolTip(f"Default: {control.default}")
         reset.setVisible(control.has_valid_default)
-        reset.clicked.connect(lambda: self._on_edited(control.default))
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(label)
+        layout.addWidget(name)
         layout.addWidget(self._editor, 1)
         layout.addWidget(self._readout)
         layout.addWidget(reset)
@@ -88,6 +89,7 @@ class ControlsPanel(QWidget):
         self._rows: dict[str, ControlRow] = {}
         self._layout = QVBoxLayout(self)
         self._layout.setContentsMargins(0, 0, 0, 0)
+        self._layout.setSpacing(6)
         model.updated.connect(self._on_updated)
         self._on_updated(model.controls())
 
