@@ -2,7 +2,7 @@
 
 A Linux control panel for the Insta360 Link 2 webcam.
 
-![Link Studio showing the Framing page beside the preview: pan, tilt and zoom sliders, a nudge pad and six camera presets](media/link-studio.png)
+![Link Studio showing the Image page beside the preview panel: brightness, contrast, white balance and focus controls read from the camera](media/link-studio.png)
 
 Insta360's own Link Controller only runs on Windows and macOS. On Linux the
 camera works as a normal webcam, but its framing, AI tracking and startup
